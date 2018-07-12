@@ -14,9 +14,9 @@ namespace PhpMerge\Test;
 use PhpMerge\MergeConflict;
 use PhpMerge\MergeException;
 use PhpMerge\PhpMergeInterface;
+use PHPUnit\Framework\TestCase;
 
-
-abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractPhpMergeTest extends TestCase
 {
     /**
      * Merger class.
@@ -161,7 +161,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['3'], ['C'], ['B'], 2, 2),
+                new MergeConflict(["3\n"], ["C\n"], ["B\n"], 2, 2),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals(self::split("A2C4C"), $e->getMerged());
@@ -171,7 +171,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['3'], ['B'], ['C'], 2, 2),
+                new MergeConflict(["3\n"], ["B\n"], ["C\n"], 2, 2),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals(self::split("A2B4C"), $e->getMerged());
@@ -185,7 +185,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['1', '2', '3'], ['3'], ['1', 'B', 'B'], 0, 0),
+                new MergeConflict(["1\n", "2\n", "3\n"], ["3\n"], ["1\n", "B\n", "B\n"], 0, 0),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($remote, $e->getMerged());
@@ -196,7 +196,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['1', '2', '3'], ['1', 'B', 'B'], ['3'], 0, 0),
+                new MergeConflict(["1\n", "2\n", "3\n"], ["1\n", "B\n", "B\n"], ["3\n"], 0, 0),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
@@ -210,8 +210,8 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['2', '3'], [], ['B', 'B', 'B'], 2, 2),
-              new MergeConflict([], ['6'], ['!', '6'], 5, 3),
+                new MergeConflict(["2\n", "3\n"], [], ["B\n", "B\n", "B\n"], 2, 2),
+                new MergeConflict([], ["6\n"], ["!\n", "6\n"], 5, 3),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($remote, $e->getMerged());
@@ -222,8 +222,8 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['2', '3'], ['B', 'B', 'B'], [], 2, 2),
-              new MergeConflict([], ['!', '6'], ['6'], 5, 6),
+                new MergeConflict(["2\n", "3\n"], ["B\n", "B\n", "B\n"], [], 2, 2),
+                new MergeConflict([], ["!\n", "6\n"], ["6\n"], 5, 6),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
@@ -237,7 +237,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['9'], ['A'], ['B'], 8, 7),
+                new MergeConflict(["9\n"], ["A\n"], ["B\n"], 8, 7),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals(self::split("A34B678A0"), $e->getMerged());
@@ -248,9 +248,9 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = $e->getConflicts();
-            $this->assertEquals(['9'], $conflicts[0]->getBase());
-            $this->assertEquals(['B'], $conflicts[0]->getRemote());
-            $this->assertEquals(['A'], $conflicts[0]->getLocal());
+            $this->assertEquals(["9\n"], $conflicts[0]->getBase());
+            $this->assertEquals(["B\n"], $conflicts[0]->getRemote());
+            $this->assertEquals(["A\n"], $conflicts[0]->getLocal());
             $this->assertEquals(8, $conflicts[0]->getBaseLine());
             $this->assertEquals(7, $conflicts[0]->getMergedLine());
             $this->assertEquals(self::split("A34B678B0"), $e->getMerged());
@@ -264,7 +264,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['1', '2'], ['a', 'a', 'a'], ['B'], 0, 0),
+                new MergeConflict(["1\n", "2\n"], ["a\n", "a\n", "a\n"], ["B\n"], 0, 0),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals(self::split("aaa34A6B8C"), $e->getMerged());
@@ -286,7 +286,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['a'], [], ['a', 'a'], 3, 3),
+                new MergeConflict(["a\n"], [], ["a\n", "a\n"], 3, 3),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($remote, $e->getMerged());
@@ -297,7 +297,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['a'], ['a', 'a'], [], 3, 3),
+                new MergeConflict(["a\n"], ["a\n", "a\n"], [], 3, 3),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
@@ -311,16 +311,16 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
     public function testNewLines()
     {
 
-        $base     = self::split("0123", 0);
-        $remote   = self::split("0123A", 0);
-        $local    = self::split("0123B", 0);
+        $base   = self::split("0123", 0);
+        $remote = self::split("0123A", 0);
+        $local  = self::split("0123B", 0);
 
         try {
             $this->merger->merge($base, $remote, $local);
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict([], ['A'], ['B'], 3, 3),
+                new MergeConflict(['3'], ["3\n", "A"], ["3\n", "B"], 3, 3),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($remote, $e->getMerged());
@@ -331,12 +331,18 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict([], ['B'], ['A'], 3, 3),
+                new MergeConflict(['3'], ["3\n", "B"], ["3\n", "A"], 3, 3),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
         }
+    }
 
+    /**
+     * @group new-line
+     */
+    public function testNewLinesWithBlankLines()
+    {
 
         $base     = self::split("0123", 2);
         $remote   = self::split("0123", 1);
@@ -347,7 +353,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict([''], [], ['', ''], 5, 5),
+              new MergeConflict(["\n"], [], ["\n", "\n"], 4, 4),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($remote, $e->getMerged());
@@ -358,7 +364,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict([''], ['', ''], [], 5, 5),
+              new MergeConflict(["\n"], ["\n", "\n"], [], 4, 4),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
@@ -379,8 +385,8 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict([], ['A'], ['B'], -1, 0),
-              new MergeConflict(['4'], ['A', '4'], ['B'], 4, 5),
+                new MergeConflict([], ["A\n"], ["B\n"], -1, 0),
+                new MergeConflict(["4\n"], ["A\n", "4\n"], ["B\n"], 4, 5),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($remote, $e->getMerged());
@@ -391,8 +397,8 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict([], ['B'], ['A'], -1, 0),
-              new MergeConflict(['4'], ['B'], ['A', '4'], 4, 5),
+                new MergeConflict([], ["B\n"], ["A\n"], -1, 0),
+                new MergeConflict(["4\n"], ["B\n"], ["A\n", "4\n"], 4, 5),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
@@ -458,7 +464,7 @@ EOD;
             $this->assertTrue(false, 'Merge Exception not thrown.');
         } catch (MergeException $e) {
             $conflicts = [
-              new MergeConflict(['normal'], ['normal??'], ['normal!!'], 3, 3),
+                new MergeConflict(["normal\n"], ["normal??\n"], ["normal!!\n"], 3, 3),
             ];
             $this->assertEquals($conflicts, $e->getConflicts());
         }

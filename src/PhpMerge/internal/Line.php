@@ -10,6 +10,7 @@
 
 namespace PhpMerge\internal;
 
+use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Line as DiffLine;
 
 /**
@@ -23,25 +24,28 @@ use SebastianBergmann\Diff\Line as DiffLine;
  * @link       http://github.com/bircher/php-merge
  * @internal   This class is not part of the public api.
  */
-final class Line extends DiffLine
+final class Line
 {
 
     /**
      * @var int
      */
     protected $index;
+    /**
+     * @var DiffLine
+     */
+    private $line;
 
     /**
      * Line constructor.
-     * @param int $type
-     * @param string $content
-     * @param int $index
+     *
+     * @param DiffLine $line
+     * @param int      $index
      */
-    public function __construct($type = self::UNCHANGED, $content = '', $index = null)
+    public function __construct(DiffLine $line, $index = null)
     {
-        parent::__construct($type, $content);
-
         $this->index = $index;
+        $this->line = $line;
     }
 
     /**
@@ -52,6 +56,16 @@ final class Line extends DiffLine
         return $this->index;
     }
 
+    public function getContent(): string
+    {
+        return $this->line->getContent();
+    }
+
+    public function getType(): int
+    {
+        return $this->line->getType();
+    }
+
     /**
      * @param array $diff
      * @return Line[]
@@ -60,20 +74,20 @@ final class Line extends DiffLine
     {
         $index = -1;
         $lines = [];
-        foreach ($diff as $key => $value) {
+        foreach ($diff as $value) {
             switch ($value[1]) {
-                case 0:
+                case Differ::OLD:
                     $index++;
-                    $line = new Line(Line::UNCHANGED, $value[0], $index);
+                    $line = new Line(new DiffLine(DiffLine::UNCHANGED, $value[0]), $index);
                     break;
 
-                case 1:
-                    $line = new Line(Line::ADDED, $value[0], $index);
+                case Differ::ADDED:
+                    $line = new Line(new DiffLine(DiffLine::ADDED, $value[0]), $index);
                     break;
 
-                case 2:
+                case Differ::REMOVED:
                     $index++;
-                    $line = new Line(Line::REMOVED, $value[0], $index);
+                    $line = new Line(new DiffLine(DiffLine::REMOVED, $value[0]), $index);
                     break;
 
                 default:

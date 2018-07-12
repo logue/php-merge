@@ -12,6 +12,8 @@ namespace PhpMerge\Test;
 
 use PhpMerge\internal\Hunk;
 use PhpMerge\internal\Line;
+use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Diff\Line as DiffLine;
 
 /**
  * Class HunkTest
@@ -19,19 +21,19 @@ use PhpMerge\internal\Line;
  *
  * @group hunk
  */
-class HunkTest extends \PHPUnit_Framework_TestCase
+class HunkTest extends TestCase
 {
 
 
     public function testCreate() 
     {
         $lines = [
-          new Line(Line::ADDED, 'added', -1),
-          new Line(Line::UNCHANGED, 'unchanged', 0),
-          new Line(Line::REMOVED, 'replaced', 1),
-          new Line(Line::ADDED, 'replacement', 1),
-          new Line(Line::UNCHANGED, 'unchanged', 2),
-          new Line(Line::REMOVED, 'removed', 3),
+          new Line(new DiffLine(DiffLine::ADDED, 'added'), -1),
+          new Line(new DiffLine(DiffLine::UNCHANGED, 'unchanged'), 0),
+          new Line(new DiffLine(DiffLine::REMOVED, 'replaced'), 1),
+          new Line(new DiffLine(DiffLine::ADDED, 'replacement'), 1),
+          new Line(new DiffLine(DiffLine::UNCHANGED, 'unchanged'), 2),
+          new Line(new DiffLine(DiffLine::REMOVED, 'removed'), 3),
         ];
 
         $expected = [

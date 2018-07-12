@@ -78,19 +78,14 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
         $this->setup();
 
         $file = tempnam($this->dir, '');
-        $base = self::preMergeAlter($base);
-        $remote = self::preMergeAlter($remote);
-        $local = self::preMergeAlter($local);
         try {
-            $merged = $this->mergeFile($file, $base, $remote, $local);
-            return self::postMergeAlter($merged);
+            return $this->mergeFile($file, $base, $remote, $local);
         } catch (GitException $e) {
             // Get conflicts by reading from the file.
             $conflicts = [];
             $merged = [];
             self::getConflicts($file, $base, $remote, $local, $conflicts, $merged);
-            $merged = implode("\n", $merged);
-            $merged = self::postMergeAlter($merged);
+            $merged = implode("", $merged);
             // Set the file to the merged one with the first text for conflicts.
             file_put_contents($file, $merged);
             $this->git->add($file);
@@ -159,7 +154,7 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
      */
     protected static function getConflicts($file, $baseText, $remoteText, $localText, &$conflicts, &$merged)
     {
-        $raw = new \ArrayObject(explode("\n", file_get_contents($file)));
+        $raw = new \ArrayObject(\preg_split('/(.*\R)/', file_get_contents($file), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
         $lineIterator = $raw->getIterator();
         $state = 'unchanged';
         $conflictIndicator = [
@@ -339,12 +334,12 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
             }
             $this->dir = $tempfile . '.git';
             $this->git = $this->wrapper->init($this->dir);
-
         }
         if ($this->git) {
             $this->git->config('user.name', 'GitMerge');
             $this->git->config('user.email', 'gitmerge@php-merge.example.com');
-            $this->git->config('merge.conflictStyle', 'diff3');        }
+            $this->git->config('merge.conflictStyle', 'diff3');
+        }
     }
 
     /**

@@ -10,6 +10,8 @@
 
 namespace PhpMerge\internal;
 
+use SebastianBergmann\Diff\Line as DiffLine;
+
 /**
  * Class Hunk
  *
@@ -95,14 +97,14 @@ final class Hunk
      */
     public static function createArray($lines)
     {
-        $op = Line::UNCHANGED;
+        $op = DiffLine::UNCHANGED;
         $hunks = [];
         /** @var Hunk $current */
         $current = null;
         foreach ($lines as $line) {
             switch ($line->getType()) {
-                case Line::REMOVED:
-                    if ($op != Line::REMOVED) {
+                case DiffLine::REMOVED:
+                    if ($op != DiffLine::REMOVED) {
                         // The last line was not removed so we start a new hunk.
                         $current = new Hunk($line, Hunk::REMOVED, $line->getIndex());
                     } else {
@@ -110,23 +112,23 @@ final class Hunk
                         $current->addLine($line);
                     }
                     break;
-                case Line::ADDED:
+                case DiffLine::ADDED:
                     switch ($op) {
-                        case Line::REMOVED:
+                        case DiffLine::REMOVED:
                             // The hunk is a replacement.
                             $current->setType(Hunk::REPLACED);
                             $current->addLine($line);
                             break;
-                        case Line::ADDED:
+                        case DiffLine::ADDED:
                             $current->addLine($line);
                             break;
-                        case Line::UNCHANGED:
+                        case DiffLine::UNCHANGED:
                             // Add a new hunk with the added type.
                             $current = new Hunk($line, Hunk::ADDED, $line->getIndex());
                             break;
                     }
                     break;
-                case Line::UNCHANGED:
+                case DiffLine::UNCHANGED:
                     if ($current) {
                         // The hunk exists so add it to the array.
                         $hunks[] = $current;
@@ -204,7 +206,7 @@ final class Hunk
         return array_values(array_filter(
             $this->lines,
             function (Line $line) {
-                return $line->getType() == Line::REMOVED;
+                return $line->getType() == DiffLine::REMOVED;
             }
         ));
     }
@@ -219,7 +221,7 @@ final class Hunk
         return array_values(array_filter(
             $this->lines,
             function (Line $line) {
-                return $line->getType() == Line::ADDED;
+                return $line->getType() == DiffLine::ADDED;
             }
         ));
     }

@@ -10,17 +10,19 @@
 
 namespace PhpMerge\Test;
 
-
 use PhpMerge\internal\Line;
+use PHPUnit\Framework\TestCase;
 use SebastianBergmann\Diff\Differ;
+use SebastianBergmann\Diff\Line as DiffLine;
 
 /**
  * Class LineTest
+ *
  * @package PhpMerge\Test
  */
-class LineTest extends \PHPUnit_Framework_TestCase
+class LineTest extends TestCase
 {
-    
+
     public function testCreate()
     {
 
@@ -30,32 +32,33 @@ replaced
 unchanged
 removed
 EOD;
-        $after = <<<'EOD'
+        $after  = <<<'EOD'
 added
 unchanged
 replacement
 unchanged
+
 EOD;
 
         $diff = [
-        ['added', 1],
-        ['unchanged', 0],
-        ['replaced', 2],
-        ['replacement', 1],
-        ['unchanged', 0],
-        ['removed', 2]
+            ["added\n", Differ::ADDED],
+            ["unchanged\n", Differ::OLD],
+            ["replaced\n", Differ::REMOVED],
+            ["replacement\n", Differ::ADDED],
+            ["unchanged\n", Differ::OLD],
+            ["removed", Differ::REMOVED],
         ];
 
         $lines = [
-        new Line(Line::ADDED, 'added', -1),
-        new Line(Line::UNCHANGED, 'unchanged', 0),
-        new Line(Line::REMOVED, 'replaced', 1),
-        new Line(Line::ADDED, 'replacement', 1),
-        new Line(Line::UNCHANGED, 'unchanged', 2),
-        new Line(Line::REMOVED, 'removed', 3),
+            new Line(new DiffLine(DiffLine::ADDED, "added\n"), -1),
+            new Line(new DiffLine(DiffLine::UNCHANGED, "unchanged\n"), 0),
+            new Line(new DiffLine(DiffLine::REMOVED, "replaced\n"), 1),
+            new Line(new DiffLine(DiffLine::ADDED, "replacement\n"), 1),
+            new Line(new DiffLine(DiffLine::UNCHANGED, "unchanged\n"), 2),
+            new Line(new DiffLine(DiffLine::REMOVED, "removed"), 3),
         ];
 
-        $differ = new Differ();
+        $differ     = new Differ();
         $array_diff = $differ->diffToArray($before, $after);
         $this->assertEquals($diff, $array_diff);
 
