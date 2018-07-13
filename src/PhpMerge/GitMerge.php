@@ -154,7 +154,13 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
      */
     protected static function getConflicts($file, $baseText, $remoteText, $localText, &$conflicts, &$merged)
     {
-        $raw = new \ArrayObject(\preg_split('/(.*\R)/', file_get_contents($file), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY));
+        $lines = \preg_split(
+            '/(.*\R)/',
+            file_get_contents($file),
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+        );
+        $raw = new \ArrayObject($lines);
         $lineIterator = $raw->getIterator();
         $state = 'unchanged';
         $conflictIndicator = [
