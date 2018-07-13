@@ -17,9 +17,9 @@
     },
     "require-dev": {
         "cpliakas/git-wrapper": "~2.0",
-        "pdepend/pdepend": "~1.0",
-        "phploc/phploc": "~2.0",
-        "phpmd/phpmd": "~1.0",
+        "pdepend/pdepend": "^2.5",
+        "phploc/phploc": "~4.0",
+        "phpmd/phpmd": "^2.6",
         "phpunit/phpunit": "^7.0",
         "psr/log": "~1.0",
         "scrutinizer/ocular": "~1.0",
