@@ -10,6 +10,7 @@
 
 namespace PhpMerge\Test;
 
+use PHPUnit\Framework\TestCase;
 use PhpMerge\internal\Hunk;
 use PhpMerge\internal\Line;
 
@@ -19,11 +20,9 @@ use PhpMerge\internal\Line;
  *
  * @group hunk
  */
-class HunkTest extends \PHPUnit_Framework_TestCase
+class HunkTest extends TestCase
 {
-
-
-    public function testCreate() 
+    public function testCreate()
     {
         $lines = [
           new Line(Line::ADDED, 'added', -1),

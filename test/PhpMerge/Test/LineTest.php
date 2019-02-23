@@ -10,7 +10,7 @@
 
 namespace PhpMerge\Test;
 
-
+use PHPUnit\Framework\TestCase;
 use PhpMerge\internal\Line;
 use SebastianBergmann\Diff\Differ;
 
@@ -18,12 +18,10 @@ use SebastianBergmann\Diff\Differ;
  * Class LineTest
  * @package PhpMerge\Test
  */
-class LineTest extends \PHPUnit_Framework_TestCase
+class LineTest extends TestCase
 {
-    
     public function testCreate()
     {
-
         $before = <<<'EOD'
 unchanged
 replaced

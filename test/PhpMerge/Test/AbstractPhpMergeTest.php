@@ -10,13 +10,12 @@
 
 namespace PhpMerge\Test;
 
-
+use PHPUnit\Framework\TestCase;
 use PhpMerge\MergeConflict;
 use PhpMerge\MergeException;
 use PhpMerge\PhpMergeInterface;
 
-
-abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractPhpMergeTest extends TestCase
 {
     /**
      * Merger class.
@@ -36,7 +35,7 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp():void
     {
         $this->merger = $this->createMerger();
     }
@@ -121,7 +120,6 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
         $result = $this->merger->merge($base, $local, $remote);
         $this->assertEquals($expected, $result);
-
     }
 
     /**
@@ -269,7 +267,6 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals(self::split("aaa34A6B8C"), $e->getMerged());
         }
-
     }
 
     /**
@@ -302,7 +299,6 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($conflicts, $e->getConflicts());
             $this->assertEquals($local, $e->getMerged());
         }
-
     }
 
     /**
@@ -310,7 +306,6 @@ abstract class AbstractPhpMergeTest extends \PHPUnit_Framework_TestCase
      */
     public function testNewLines()
     {
-
         $base     = self::split("0123", 0);
         $remote   = self::split("0123A", 0);
         $local    = self::split("0123B", 0);
@@ -479,5 +474,4 @@ EOD;
     {
         return implode("\n", str_split($string)) . str_repeat("\n", $emptyLines);
     }
-
 }
