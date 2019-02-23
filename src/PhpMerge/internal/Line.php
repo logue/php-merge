@@ -10,8 +10,6 @@
 
 namespace PhpMerge\internal;
 
-use SebastianBergmann\Diff\Line as DiffLine;
-
 /**
  * Class Line
  *
@@ -23,8 +21,11 @@ use SebastianBergmann\Diff\Line as DiffLine;
  * @link       http://github.com/bircher/php-merge
  * @internal   This class is not part of the public api.
  */
-final class Line extends DiffLine
+final class Line
 {
+    public const ADDED     = 1;
+    public const REMOVED   = 2;
+    public const UNCHANGED = 3;
 
     /**
      * @var int
@@ -39,15 +40,15 @@ final class Line extends DiffLine
      */
     public function __construct($type = self::UNCHANGED, $content = '', $index = null)
     {
-        parent::__construct($type, $content);
-
         $this->index = $index;
+        $this->type    = $type;
+        $this->content = $content;
     }
 
     /**
      * @return int
      */
-    public function getIndex()
+    public function getIndex():int
     {
         return $this->index;
     }
@@ -56,7 +57,7 @@ final class Line extends DiffLine
      * @param array $diff
      * @return Line[]
      */
-    public static function createArray($diff)
+    public static function createArray($diff):array
     {
         $index = -1;
         $lines = [];
@@ -82,5 +83,15 @@ final class Line extends DiffLine
             $lines[] = $line;
         }
         return $lines;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function getType(): int
+    {
+        return $this->type;
     }
 }

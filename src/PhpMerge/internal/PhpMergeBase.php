@@ -42,7 +42,7 @@ abstract class PhpMergeBase implements PhpMergeInterface
      * @return string|null
      *   The merge result or null if the merge is not obvious.
      */
-    protected static function simpleMerge(string $base, string $remote, string $local)
+    protected static function simpleMerge(string $base, string $remote, string $local): ?string
     {
         // Skip complex merging if there is nothing to do.
         if ($base == $remote) {

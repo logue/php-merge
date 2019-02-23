@@ -30,12 +30,12 @@ final class MergeException extends \RuntimeException
     /**
      * @var \PhpMerge\MergeConflict[]
      */
-    protected $conflicts;
+    protected $conflicts = [];
 
     /**
      * @var string
      */
-    protected $merged;
+    protected $merged = "";
 
     /**
      * MergeException constructor.
@@ -51,7 +51,7 @@ final class MergeException extends \RuntimeException
      * @param \Exception $previous
      *   The previous exception used for the exception chaining.
      */
-    public function __construct($message = "", $conflicts = [], $merged = null, $code = 0, \Exception $previous = null)
+    public function __construct($message = "", $conflicts = [], $merged = "", $code = 0, \Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->conflicts = $conflicts;
@@ -64,7 +64,7 @@ final class MergeException extends \RuntimeException
      * @return \PhpMerge\MergeConflict[]
      *   All the conflicts that happened during the merge.
      */
-    public function getConflicts()
+    public function getConflicts():array
     {
         return $this->conflicts;
     }

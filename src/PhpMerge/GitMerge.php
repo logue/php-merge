@@ -55,13 +55,13 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
      * The temporary directory in which git can work.
      * @var string
      */
-    protected $dir;
+    protected $dir = "";
 
     /**
      * The text of the last conflict
      * @var string
      */
-    protected $conflict;
+    protected $conflict = "";
 
     /**
      * {@inheritdoc}
@@ -339,12 +339,12 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
             }
             $this->dir = $tempfile . '.git';
             $this->git = $this->wrapper->init($this->dir);
-
         }
         if ($this->git) {
             $this->git->config('user.name', 'GitMerge');
             $this->git->config('user.email', 'gitmerge@php-merge.example.com');
-            $this->git->config('merge.conflictStyle', 'diff3');        }
+            $this->git->config('merge.conflictStyle', 'diff3');
+        }
     }
 
     /**
@@ -361,12 +361,14 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
 
             foreach ($files as $fileinfo) {
                 if ($fileinfo->isDir()) {
-                    rmdir($fileinfo->getRealPath());
+                    @rmdir($fileinfo->getRealPath());
                 } else {
-                    unlink($fileinfo->getRealPath());
+                    @unlink($fileinfo->getRealPath());
                 }
             }
-            rmdir($this->dir);
+
+            @rmdir($this->dir);
+        
             unset($this->git);
         }
     }

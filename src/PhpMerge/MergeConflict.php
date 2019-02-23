@@ -32,35 +32,35 @@ final class MergeConflict
      *
      * @var string[]
      */
-    protected $base;
+    protected $base = [];
 
     /**
      * The conflicting line changes from the first source.
      *
      * @var string[]
      */
-    protected $remote;
+    protected $remote = [];
 
     /**
      * The conflicting line changes from the second source.
      *
      * @var string[]
      */
-    protected $local;
+    protected $local = [];
 
     /**
      * The line number in the original text.
      *
      * @var int
      */
-    protected $baseLine;
+    protected $baseLine = 0;
 
     /**
      * The line number in the merged text.
      *
      * @var int
      */
-    protected $mergedLine;
+    protected $mergedLine = 0;
 
     /**
      * MergeConflict constructor.
@@ -91,7 +91,7 @@ final class MergeConflict
      * @return string[]
      *   The array of lines which are involved in the conflict.
      */
-    public function getBase()
+    public function getBase():array
     {
         return $this->base;
     }
@@ -102,7 +102,7 @@ final class MergeConflict
      * @return string[]
      *   The array of lines from the first text involved in the conflict.
      */
-    public function getRemote()
+    public function getRemote():array
     {
         return $this->remote;
     }
@@ -113,7 +113,7 @@ final class MergeConflict
      * @return string[]
      *   The array of lines from the first text involved in the conflict.
      */
-    public function getLocal()
+    public function getLocal():array
     {
         return $this->local;
     }
@@ -124,7 +124,7 @@ final class MergeConflict
      * @return int
      *   The line number as in the original text.
      */
-    public function getBaseLine()
+    public function getBaseLine():int
     {
         return $this->baseLine;
     }
@@ -135,7 +135,7 @@ final class MergeConflict
      * @return int
      *   The line number in the merged text.
      */
-    public function getMergedLine()
+    public function getMergedLine():int
     {
         return $this->mergedLine;
     }

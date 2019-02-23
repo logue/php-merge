@@ -25,7 +25,6 @@ namespace PhpMerge\internal;
  */
 final class Hunk
 {
-
     const ADDED = 1;
     const REMOVED = 2;
     const REPLACED = 3;
