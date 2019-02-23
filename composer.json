@@ -1,5 +1,5 @@
 {
-    "name": "bircher/php-merge",
+    "name": "logue/php-merge",
     "type": "library",
     "description": "A PHP merge utility using the Diff php library or the command line git.",
     "keywords": [
@@ -13,6 +13,10 @@
         {
             "name": "Fabian Bircher",
             "email": "opensource@fabianbircher.com"
+        },
+        {
+            "name": "Masashi Yoshikawa",
+            "email": "logue@hotmail.co.jp"
         }
     ],
     "require": {
