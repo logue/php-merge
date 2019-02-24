@@ -10,10 +10,10 @@
 
 namespace PhpMerge;
 
-use GitWrapper\GitWrapper;
 use GitWrapper\GitException;
-use PhpMerge\internal\Line;
+use GitWrapper\GitWrapper;
 use PhpMerge\internal\Hunk;
+use PhpMerge\internal\Line;
 use PhpMerge\internal\PhpMergeBase;
 use SebastianBergmann\Diff\Differ;
 
@@ -26,17 +26,18 @@ use SebastianBergmann\Diff\Differ;
  * with merging, it has a considerable performance implication. So now this
  * implementation serves as a reference to make sure the other classes behave.
  *
- * @package   PhpMerge
  * @author    Fabian Bircher <opensource@fabianbircher.com>
  * @copyright 2015 Fabian Bircher <opensource@fabianbircher.com>
  * @license   https://opensource.org/licenses/MIT
+ *
  * @version   Release: @package_version@
+ *
  * @link      http://github.com/bircher/php-merge
+ *
  * @category  library
  */
 final class GitMerge extends PhpMergeBase implements PhpMergeInterface
 {
-
     /**
      * The git working directory.
      *
@@ -53,15 +54,17 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
 
     /**
      * The temporary directory in which git can work.
+     *
      * @var string
      */
-    protected $dir = "";
+    protected $dir = '';
 
     /**
-     * The text of the last conflict
+     * The text of the last conflict.
+     *
      * @var string
      */
-    protected $conflict = "";
+    protected $conflict = '';
 
     /**
      * {@inheritdoc}
@@ -81,8 +84,10 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
         $base = self::preMergeAlter($base);
         $remote = self::preMergeAlter($remote);
         $local = self::preMergeAlter($local);
+
         try {
             $merged = $this->mergeFile($file, $base, $remote, $local);
+
             return self::postMergeAlter($merged);
         } catch (GitException $e) {
             // Get conflicts by reading from the file.
@@ -95,6 +100,7 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
             file_put_contents($file, $merged);
             $this->git->add($file);
             $this->git->commit('Resolve merge conflict.');
+
             throw new MergeException('A merge conflict has occured.', $conflicts, $merged, 0, $e);
         }
     }
@@ -102,17 +108,12 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
     /**
      * Merge three strings in a specified file.
      *
-     * @param string $file
-     *   The file name in the git repository to which the content is written.
-     * @param string $base
-     *   The common base text.
-     * @param string $remote
-     *   The first changed text.
-     * @param string $local
-     *   The second changed text
+     * @param string $file   The file name in the git repository to which the content is written.
+     * @param string $base   The common base text.
+     * @param string $remote The first changed text.
+     * @param string $local  The second changed text
      *
-     * @return string
-     *   The merged text.
+     * @return string The merged text.
      */
     protected function mergeFile(string $file, string $base, string $remote, string $local) : string
     {
@@ -138,35 +139,36 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
         $this->git->commit('Add local.');
 
         $this->git->merge('original');
+
         return file_get_contents($file);
     }
 
     /**
      * Get the conflicts from a file which is left with merge conflicts.
      *
-     * @param string $file
-     *   The file name.
-     * @param string $baseText
-     *   The original text used for merging.
-     * @param string $remoteText
-     *   The first chaned text.
-     * @param string $localText
-     *   The second changed text.
-     * @param MergeConflict[] $conflicts
-     *   The merge conflicts will be apended to this array.
-     * @param string[] $merged
-     *   The merged text resolving conflicts by using the first set of changes.
+     * @param string          $file       The file name.
+     * @param string          $baseText   The original text used for merging.
+     * @param string          $remoteText The first chaned text.
+     * @param string          $localText  The second changed text.
+     * @param MergeConflict[] $conflicts  The merge conflicts will be apended to this array.
+     * @param string[]        $merged     The merged text resolving conflicts by using the first set of changes.
      */
-    protected static function getConflicts($file, $baseText, $remoteText, $localText, &$conflicts, &$merged)
+    protected static function getConflicts(string $file, string $baseText, string $remoteText, string $localText, array &$conflicts, array &$merged):void
     {
-        $raw = new \ArrayObject(explode("\n", file_get_contents($file)));
+        $lines = \preg_split(
+            '/(.*\R)/',
+            file_get_contents($file),
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+        );
+        $raw = new \ArrayObject($lines);
         $lineIterator = $raw->getIterator();
         $state = 'unchanged';
         $conflictIndicator = [
-            '<<<<<<< HEAD' => 'local',
+            '<<<<<<< HEAD'                    => 'local',
             '||||||| merged common ancestors' => 'base',
-            '=======' => 'remote',
-            '>>>>>>> original' => 'end conflict',
+            '======='                         => 'remote',
+            '>>>>>>> original'                => 'end conflict',
         ];
 
         // Create hunks from the text diff.
@@ -291,16 +293,18 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
 
     /**
      * @param $text
+     *
      * @return string
      */
-    protected static function preMergeAlter($text) : string
+    protected static function preMergeAlter(string $text) : string
     {
         // Append new lines so that conflicts at the end of the text work.
-        return $text . "\nthe\nend";
+        return $text."\nthe\nend";
     }
 
     /**
      * @param $text
+     *
      * @return bool|string
      */
     protected static function postMergeAlter($text) : string
@@ -328,16 +332,16 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
     /**
      * Set up the git wrapper and the temporary directory.
      */
-    protected function setup()
+    protected function setup():void
     {
         if (!$this->dir) {
             // Greate a temporary directory.
             $tempfile = tempnam(sys_get_temp_dir(), '');
-            mkdir($tempfile . '.git');
+            mkdir($tempfile.'.git');
             if (file_exists($tempfile)) {
                 unlink($tempfile);
             }
-            $this->dir = $tempfile . '.git';
+            $this->dir = $tempfile.'.git';
             $this->git = $this->wrapper->init($this->dir);
         }
         if ($this->git) {
@@ -350,7 +354,7 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
     /**
      * Clean the temporary directory used for merging.
      */
-    protected function cleanup()
+    protected function cleanup():void
     {
         if (is_dir($this->dir)) {
             // Recursively delete all files and folders.
@@ -368,7 +372,7 @@ final class GitMerge extends PhpMergeBase implements PhpMergeInterface
             }
 
             @rmdir($this->dir);
-        
+
             unset($this->git);
         }
     }

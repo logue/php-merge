@@ -10,39 +10,43 @@
 
 namespace PhpMerge\internal;
 
+use SebastianBergmann\Diff\Differ;
+use SebastianBergmann\Diff\Line as DiffLine;
+
 /**
- * Class Line
+ * Class Line.
  *
- * @package    PhpMerge
  * @author     Fabian Bircher <opensource@fabianbircher.com>
  * @copyright  Fabian Bircher <opensource@fabianbircher.com>
  * @license    https://opensource.org/licenses/MIT
+ *
  * @version    Release: @package_version@
+ *
  * @link       http://github.com/bircher/php-merge
+ *
  * @internal   This class is not part of the public api.
  */
 final class Line
 {
-    public const ADDED     = 1;
-    public const REMOVED   = 2;
-    public const UNCHANGED = 3;
-
     /**
      * @var int
      */
-    protected $index;
+    protected $index = 0;
+    /**
+     * @var DiffLine
+     */
+    private $line;
 
     /**
      * Line constructor.
-     * @param int $type
-     * @param string $content
-     * @param int $index
+     *
+     * @param DiffLine $line
+     * @param int      $index
      */
-    public function __construct($type = self::UNCHANGED, $content = '', $index = null)
+    public function __construct(DiffLine $line, ?int $index = null)
     {
         $this->index = $index;
-        $this->type    = $type;
-        $this->content = $content;
+        $this->line = $line;
     }
 
     /**
@@ -53,28 +57,39 @@ final class Line
         return $this->index;
     }
 
+    public function getContent(): string
+    {
+        return $this->line->getContent();
+    }
+
+    public function getType(): int
+    {
+        return $this->line->getType();
+    }
+
     /**
      * @param array $diff
+     *
      * @return Line[]
      */
-    public static function createArray($diff):array
+    public static function createArray(array $diff):array
     {
         $index = -1;
         $lines = [];
-        foreach ($diff as $key => $value) {
+        foreach ($diff as $value) {
             switch ($value[1]) {
-                case 0:
+                case Differ::OLD:
                     $index++;
-                    $line = new Line(Line::UNCHANGED, $value[0], $index);
+                    $line = new self(new DiffLine(DiffLine::UNCHANGED, $value[0]), $index);
                     break;
 
-                case 1:
-                    $line = new Line(Line::ADDED, $value[0], $index);
+                case Differ::ADDED:
+                    $line = new self(new DiffLine(DiffLine::ADDED, $value[0]), $index);
                     break;
 
-                case 2:
+                case Differ::REMOVED:
                     $index++;
-                    $line = new Line(Line::REMOVED, $value[0], $index);
+                    $line = new self(new DiffLine(DiffLine::REMOVED, $value[0]), $index);
                     break;
 
                 default:
@@ -82,16 +97,7 @@ final class Line
             }
             $lines[] = $line;
         }
+
         return $lines;
-    }
-
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    public function getType(): int
-    {
-        return $this->type;
     }
 }

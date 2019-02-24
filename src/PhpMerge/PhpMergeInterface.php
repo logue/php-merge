@@ -13,31 +13,26 @@ namespace PhpMerge;
 /**
  * Interface PhpMergeInterface.
  *
- * @package    PhpMerge
  * @author     Fabian Bircher <opensource@fabianbircher.com>
  * @copyright  Fabian Bircher <opensource@fabianbircher.com>
  * @license    https://opensource.org/licenses/MIT
+ *
  * @version    Release: @package_version@
+ *
  * @link       http://github.com/bircher/php-merge
  */
 interface PhpMergeInterface
 {
-
     /**
      * Merge texts.
      *
-     * @param string $base
-     *   The original text.
-     * @param string $remote
-     *   The first variant text.
-     * @param string $local
-     *   The second variant text.
+     * @param string $base   The original text.
+     * @param string $remote The first variant text.
+     * @param string $local  The second variant text.
      *
-     * @return string
-     *   The merge result.
+     * @throws MergeException Thrown when there is a merge conflict.
      *
-     * @throws MergeException
-     *   Thrown when there is a merge conflict.
+     * @return string The merge result.
      */
     public function merge(string $base, string $remote, string $local) : string;
 }

@@ -18,7 +18,6 @@ use PhpMerge\PhpMergeInterface;
  */
 class PhpMergeTest extends AbstractPhpMergeTest
 {
-
     /**
      * {@inheritdoc}
      */

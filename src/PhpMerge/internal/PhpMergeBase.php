@@ -13,34 +13,31 @@ namespace PhpMerge\internal;
 use PhpMerge\PhpMergeInterface;
 
 /**
- * Class PhpMergeBase
+ * Class PhpMergeBase.
  *
  * The base class implementing only the simplest logic which is common to all
  * implementations.
  *
- * @package    PhpMerge
  * @author     Fabian Bircher <opensource@fabianbircher.com>
  * @copyright  Fabian Bircher <opensource@fabianbircher.com>
  * @license    https://opensource.org/licenses/MIT
+ *
  * @version    Release: @package_version@
+ *
  * @link       http://github.com/bircher/php-merge
+ *
  * @internal   This class is not part of the public api.
  */
 abstract class PhpMergeBase implements PhpMergeInterface
 {
-
     /**
      * Merge obvious cases when only one text changes..
      *
-     * @param string $base
-     *   The original text.
-     * @param string $remote
-     *   The first variant text.
-     * @param string $local
-     *   The second variant text.
+     * @param string $base   The original text.
+     * @param string $remote The first variant text.
+     * @param string $local  The second variant text.
      *
-     * @return string|null
-     *   The merge result or null if the merge is not obvious.
+     * @return string|null The merge result or null if the merge is not obvious.
      */
     protected static function simpleMerge(string $base, string $remote, string $local): ?string
     {

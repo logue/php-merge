@@ -10,8 +10,8 @@
 
 namespace PhpMerge;
 
-use PhpMerge\internal\Line;
 use PhpMerge\internal\Hunk;
+use PhpMerge\internal\Line;
 use PhpMerge\internal\PhpMergeBase;
 use SebastianBergmann\Diff\Differ;
 
@@ -22,16 +22,16 @@ use SebastianBergmann\Diff\Differ;
  * an instance of \SebastianBergmann\Diff\Differ. The merge algorithm goes
  * through all the lines and decides which to line to use.
  *
- * @package    PhpMerge
  * @author     Fabian Bircher <opensource@fabianbircher.com>
  * @copyright  Fabian Bircher <opensource@fabianbircher.com>
  * @license    https://opensource.org/licenses/MIT
+ *
  * @version    Release: @package_version@
+ *
  * @link       http://github.com/bircher/php-merge
  */
 final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
 {
-
     /**
      * The differ used to create the diffs.
      *
@@ -49,7 +49,6 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
         }
         $this->differ = $differ;
     }
-
 
     /**
      * {@inheritdoc}
@@ -69,7 +68,7 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
                 function ($l) {
                     return [$l, 0];
                 },
-                explode("\n", $base)
+                \preg_split('/(.*\R)/', $base, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY)
             )
         );
 
@@ -77,8 +76,8 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
         $localHunks = Hunk::createArray($localDiff);
 
         $conflicts = [];
-        $merged = PhpMerge::mergeHunks($baseLines, $remoteHunks, $localHunks, $conflicts);
-        $merged = implode("\n", $merged);
+        $merged = self::mergeHunks($baseLines, $remoteHunks, $localHunks, $conflicts);
+        $merged = implode('', $merged);
 
         if (!empty($conflicts)) {
             throw new MergeException('A merge conflict has occured.', $conflicts, $merged);
@@ -90,17 +89,12 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
     /**
      * The merge algorithm.
      *
-     * @param Line[] $base
-     *   The lines of the original text.
-     * @param Hunk[] $remote
-     *   The hunks of the remote changes.
-     * @param Hunk[] $local
-     *   The hunks of the local changes.
-     * @param MergeConflict[] $conflicts
-     *   The merge conflicts.
+     * @param Line[]          $base      The lines of the original text.
+     * @param Hunk[]          $remote    The hunks of the remote changes.
+     * @param Hunk[]          $local     The hunks of the local changes.
+     * @param MergeConflict[] $conflicts The merge conflicts.
      *
-     * @return string[]
-     *   The merged text.
+     * @return string[] The merged text.
      */
     protected static function mergeHunks(array $base, array $remote, array $local, array &$conflicts = []) : array
     {
@@ -115,7 +109,7 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
         $i = -1;
 
         // Loop over all indexes of the base and all hunks.
-        while ($i <  count($base) || $a->valid() || $b->valid()) {
+        while ($i < count($base) || $a->valid() || $b->valid()) {
             // Assure that $aa is the first hunk by swaping $a and $b
             if ($a->valid() && $b->valid() && $a->current()->getStart() > $b->current()->getStart()) {
                 self::swap($a, $b, $flipped);
@@ -163,34 +157,29 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
                 $a->next();
             } else {
                 // Not dealing with a change, so return the line from the base.
-                if ($i>=0) {
+                if ($i >= 0) {
                     $merged[] = $base[$i]->getContent();
                 }
             }
             // Finally, advance the index.
             $i++;
         }
+
         return $merged;
     }
 
     /**
      * Get a Merge conflict from the two array iterators.
      *
-     * @param Line[] $base
-     *   The original lines of the base text.
-     * @param \ArrayIterator $a
-     *   The first hunk iterator.
-     * @param \ArrayIterator $b
-     *   The second hunk iterator.
-     * @param bool $flipped
-     *   Whether or not the a corresponds to remote and b to local.
-     * @param int $mergedLine
-     *   The line on which the merge conflict appears on the merged result.
+     * @param Line[]         $base       The original lines of the base text.
+     * @param \ArrayIterator $a          The first hunk iterator.
+     * @param \ArrayIterator $b          The second hunk iterator.
+     * @param bool           $flipped    Whether or not the a corresponds to remote and b to local.
+     * @param int            $mergedLine The line on which the merge conflict appears on the merged result.
      *
-     * @return MergeConflict
-     *   The merge conflict.
+     * @return MergeConflict The merge conflict.
      */
-    protected static function prepareConflict($base, &$a, &$b, &$flipped, $mergedLine)
+    protected static function prepareConflict(array $base, \ArrayIterator &$a, \ArrayIterator &$b, bool &$flipped, int $mergedLine):MergeConflict
     {
         if ($flipped) {
             self::swap($a, $b, $flipped);
@@ -251,20 +240,18 @@ final class PhpMerge extends PhpMergeBase implements PhpMergeInterface
         }
 
         $b->next();
+
         return new MergeConflict($baseLines, $remoteLines, $localLines, $start, $mergedLine);
     }
 
     /**
      * Swaps two variables.
      *
-     * @param mixed $a
-     *   The first variable which will become the second.
-     * @param mixed $b
-     *   The second variable which will become the first.
-     * @param bool $flipped
-     *   The boolean indicator which will change its value.
+     * @param mixed $a       The first variable which will become the second.
+     * @param mixed $b       The second variable which will become the first.
+     * @param bool  $flipped The boolean indicator which will change its value.
      */
-    protected static function swap(&$a, &$b, &$flipped)
+    protected static function swap(&$a, &$b, bool &$flipped)
     {
         $c = $a;
         $a = $b;

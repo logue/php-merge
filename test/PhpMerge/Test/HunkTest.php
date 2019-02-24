@@ -10,33 +10,33 @@
 
 namespace PhpMerge\Test;
 
-use PHPUnit\Framework\TestCase;
 use PhpMerge\internal\Hunk;
 use PhpMerge\internal\Line;
+use PHPUnit\Framework\TestCase;
+use SebastianBergmann\Diff\Line as DiffLine;
 
 /**
- * Class HunkTest
- * @package PhpMerge\Test
+ * Class HunkTest.
  *
  * @group hunk
  */
 class HunkTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate():void
     {
         $lines = [
-          new Line(Line::ADDED, 'added', -1),
-          new Line(Line::UNCHANGED, 'unchanged', 0),
-          new Line(Line::REMOVED, 'replaced', 1),
-          new Line(Line::ADDED, 'replacement', 1),
-          new Line(Line::UNCHANGED, 'unchanged', 2),
-          new Line(Line::REMOVED, 'removed', 3),
+            new Line(new DiffLine(DiffLine::ADDED, 'added'), -1),
+            new Line(new DiffLine(DiffLine::UNCHANGED, 'unchanged'), 0),
+            new Line(new DiffLine(DiffLine::REMOVED, 'replaced'), 1),
+            new Line(new DiffLine(DiffLine::ADDED, 'replacement'), 1),
+            new Line(new DiffLine(DiffLine::UNCHANGED, 'unchanged'), 2),
+            new Line(new DiffLine(DiffLine::REMOVED, 'removed'), 3),
         ];
 
         $expected = [
-          new Hunk($lines[0], Hunk::ADDED, -1, -1),
-          new Hunk([$lines[2], $lines[3]], Hunk::REPLACED, 1, 1),
-          new Hunk($lines[5], Hunk::REMOVED, 3, 3),
+            new Hunk($lines[0], Hunk::ADDED, -1, -1),
+            new Hunk([$lines[2], $lines[3]], Hunk::REPLACED, 1, 1),
+            new Hunk($lines[5], Hunk::REMOVED, 3, 3),
         ];
         $result = Hunk::createArray($lines);
 

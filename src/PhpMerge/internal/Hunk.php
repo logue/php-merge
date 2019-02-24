@@ -10,17 +10,21 @@
 
 namespace PhpMerge\internal;
 
+use SebastianBergmann\Diff\Line as DiffLine;
+
 /**
- * Class Hunk
+ * Class Hunk.
  *
  * This represents a collection of changed lines.
  *
- * @package    PhpMerge
  * @author     Fabian Bircher <opensource@fabianbircher.com>
  * @copyright  Fabian Bircher <opensource@fabianbircher.com>
  * @license    https://opensource.org/licenses/MIT
+ *
  * @version    Release: @package_version@
+ *
  * @link       http://github.com/bircher/php-merge
+ *
  * @internal   This class is not part of the public api.
  */
 final class Hunk
@@ -32,41 +36,37 @@ final class Hunk
     /**
      * @var int
      */
-    protected $start;
+    protected $start = 0;
     /**
      * @var int
      */
-    protected $end;
+    protected $end = 0;
     /**
      * @var Line[]
      */
-    protected $lines;
+    protected $lines = [];
     /**
      * @var int
      */
-    protected $type;
+    protected $type = 0;
 
     /**
      * The Hunk constructor.
      *
-     * @param Line|Line[] $lines
-     *   The lines belonging to the hunk.
-     * @param int $type
-     *   The type of the hunk: Hunk::ADDED Hunk::REMOVED Hunk::REPLACED
-     * @param int $start
-     *   The line index where the hunk starts.
-     * @param int $end
-     *   The line index where the hunk stops.
+     * @param Line|Line[] $lines The lines belonging to the hunk.
+     * @param int         $type  The type of the hunk: Hunk::ADDED Hunk::REMOVED Hunk::REPLACED
+     * @param int         $start The line index where the hunk starts.
+     * @param int         $end   The line index where the hunk stops.
      */
-    public function __construct($lines, $type, $start, $end = null)
+    public function __construct($lines, int $type, int $start, ?int $end = null)
     {
         $this->start = $start;
         if ($end === null) {
-            $end= $start;
+            $end = $start;
         }
         $this->end = $end;
         if (!is_array($lines)) {
-            $lines = array($lines);
+            $lines = [$lines];
         }
         $this->lines = $lines;
         $this->type = $type;
@@ -75,10 +75,9 @@ final class Hunk
     /**
      * Add a new line to the hunk.
      *
-     * @param \PhpMerge\Line $line
-     *   The line to add.
+     * @param \PhpMerge\Line $line The line to add.
      */
-    public function addLine(Line $line)
+    public function addLine(Line $line):void
     {
         $this->lines[] = $line;
         $this->end = $line->getIndex();
@@ -87,45 +86,44 @@ final class Hunk
     /**
      * Create an array of hunks out of an array of lines.
      *
-     * @param Line[] $lines
-     *   The lines of the diff.
-     * @return Hunk[]
-     *   The hunks in the lines.
+     * @param Line[] $lines The lines of the diff.
+     *
+     * @return Hunk[] The hunks in the lines.
      */
-    public static function createArray($lines)
+    public static function createArray(array $lines):array
     {
-        $op = Line::UNCHANGED;
+        $op = DiffLine::UNCHANGED;
         $hunks = [];
         /** @var Hunk $current */
         $current = null;
         foreach ($lines as $line) {
             switch ($line->getType()) {
-                case Line::REMOVED:
-                    if ($op != Line::REMOVED) {
+                case DiffLine::REMOVED:
+                    if ($op != DiffLine::REMOVED) {
                         // The last line was not removed so we start a new hunk.
-                        $current = new Hunk($line, Hunk::REMOVED, $line->getIndex());
+                        $current = new self($line, self::REMOVED, $line->getIndex());
                     } else {
                         // continue adding the line to the hunk.
                         $current->addLine($line);
                     }
                     break;
-                case Line::ADDED:
+                case DiffLine::ADDED:
                     switch ($op) {
-                        case Line::REMOVED:
+                        case DiffLine::REMOVED:
                             // The hunk is a replacement.
-                            $current->setType(Hunk::REPLACED);
+                            $current->setType(self::REPLACED);
                             $current->addLine($line);
                             break;
-                        case Line::ADDED:
+                        case DiffLine::ADDED:
                             $current->addLine($line);
                             break;
-                        case Line::UNCHANGED:
+                        case DiffLine::UNCHANGED:
                             // Add a new hunk with the added type.
-                            $current = new Hunk($line, Hunk::ADDED, $line->getIndex());
+                            $current = new self($line, self::ADDED, $line->getIndex());
                             break;
                     }
                     break;
-                case Line::UNCHANGED:
+                case DiffLine::UNCHANGED:
                     if ($current) {
                         // The hunk exists so add it to the array.
                         $hunks[] = $current;
@@ -148,7 +146,7 @@ final class Hunk
      *
      * @param int $type
      */
-    protected function setType($type)
+    protected function setType(int $type):void
     {
         $this->type = $type;
     }
@@ -158,7 +156,7 @@ final class Hunk
      *
      * @return int
      */
-    public function getStart()
+    public function getStart():int
     {
         return $this->start;
     }
@@ -168,7 +166,7 @@ final class Hunk
      *
      * @return int
      */
-    public function getEnd()
+    public function getEnd():int
     {
         return $this->end;
     }
@@ -178,7 +176,7 @@ final class Hunk
      *
      * @return int
      */
-    public function getType()
+    public function getType():int
     {
         return $this->type;
     }
@@ -188,7 +186,7 @@ final class Hunk
      *
      * @return Line[]
      */
-    public function getLines()
+    public function getLines():array
     {
         return $this->lines;
     }
@@ -198,12 +196,12 @@ final class Hunk
      *
      * @return Line[]
      */
-    public function getRemovedLines()
+    public function getRemovedLines():array
     {
         return array_values(array_filter(
             $this->lines,
             function (Line $line) {
-                return $line->getType() == Line::REMOVED;
+                return $line->getType() == DiffLine::REMOVED;
             }
         ));
     }
@@ -213,12 +211,12 @@ final class Hunk
      *
      * @return Line[]
      */
-    public function getAddedLines()
+    public function getAddedLines():array
     {
         return array_values(array_filter(
             $this->lines,
             function (Line $line) {
-                return $line->getType() == Line::ADDED;
+                return $line->getType() == DiffLine::ADDED;
             }
         ));
     }
@@ -228,7 +226,7 @@ final class Hunk
      *
      * @return string[]
      */
-    public function getLinesContent()
+    public function getLinesContent():array
     {
         return array_map(
             function (Line $line) {
@@ -241,25 +239,25 @@ final class Hunk
     /**
      * Test whether the hunk is to be considered for a conflict resolution.
      *
-     * @param int $line
-     *   The line number in the original text to test.
+     * @param int $line The line number in the original text to test.
      *
-     * @return bool
-     *   Whether the line is affected by the hunk.
+     * @return bool Whether the line is affected by the hunk.
      */
-    public function isLineNumberAffected($line)
+    public function isLineNumberAffected(int $line):bool
     {
         // Added lines also affect the ones afterwards in conflict resolution,
         // because they are added in between.
         $bleed = ($this->type == self::ADDED ? 1 : 0);
-        return ($line >= $this->start && $line <= $this->end + $bleed);
+
+        return $line >= $this->start && $line <= $this->end + $bleed;
     }
 
     /**
      * @param \PhpMerge\Hunk|null $hunk
+     *
      * @return bool
      */
-    public function hasIntersection(Hunk $hunk = null)
+    public function hasIntersection(?self $hunk = null):bool
     {
         if (!$hunk) {
             return false;
@@ -267,6 +265,7 @@ final class Hunk
         if ($this->type == self::ADDED && $hunk->type == self::ADDED) {
             return $this->start == $hunk->start;
         }
+
         return $this->isLineNumberAffected($hunk->start) || $this->isLineNumberAffected($hunk->end)
           || $hunk->isLineNumberAffected($this->start) || $hunk->isLineNumberAffected($this->end);
     }
