@@ -38,7 +38,7 @@
         "psr-0": {
             "PhpMerge": "src/"
         }
-    }
+    },
     "scripts": {
         "test": [
             "vendor/bin/phpunit"
